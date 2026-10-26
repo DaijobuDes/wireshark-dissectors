@@ -103,7 +103,6 @@ function source_proto.dissector(buffer, pinfo, tree)
 
         -- Name (string)
         local name, next_offset = read_string(buffer, offset)
-        pinfo.cols.info = string.format("A2S_INFO Response - %s", name)
         subtree:add(f_name, buffer(offset, next_offset - offset - 1))
         offset = next_offset
 
@@ -132,10 +131,12 @@ function source_proto.dissector(buffer, pinfo, tree)
         offset = offset + 2
 
         -- Players (byte)
+        local players = buffer(offset, 1):uint()
         subtree:add(f_players, buffer(offset, 1))
         offset = offset + 1
 
         -- Max players (byte)
+        local max_players = buffer(offset, 1):uint()
         subtree:add(f_max_players, buffer(offset, 1))
         offset = offset + 1
 
@@ -185,6 +186,8 @@ function source_proto.dissector(buffer, pinfo, tree)
 
         -- Extra data (uint64)
         subtree:add_le(f_extra, buffer(offset, 8))
+
+        pinfo.cols.info = string.format("A2S_INFO Response - %s (%d/%d)", name, tonumber(players), tonumber(max_players))
 
 
     ----------------------------------------------------------------------------
